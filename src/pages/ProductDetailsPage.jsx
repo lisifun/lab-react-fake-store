@@ -1,23 +1,60 @@
-import { useState } from "react";
-
+import { useState, useEffect, useContext } from "react";
+import { useParams, Link } from "react-router-dom";
+import { ProductContext } from "../context/products.context";
 
 function ProductDetailsPage() {
-  // The state variable `product` is currently an empty object {},
-  // but you should use it to store the response from the Fake Store API (the product details).
-  const [product, setProduct] = useState({});
+  const [product, setProduct] = useState(null);
 
+  const { productId } = useParams();
 
-  // The `productId` coming from the URL parameter is available in the URL path.
-  // You can access it with the `useParams` hook from react-router-dom.
+  const { loading, products, getProducts } = useContext(ProductContext);
 
+  useEffect(() => {
+    if (!products.length) {
+      getProducts();
+    } else {
+      console.log("Product Id ===>", productId);
+      console.log("Products at 21 ===>", products);
+      let thisProduct = products.find(
+        (product) => product.id === Number(productId)
+      );
+      setProduct(thisProduct);
 
-  // To fetch the product details, set up an effect with the `useEffect` hook:
-
-
+      console.log("This product ===>", thisProduct);
+    }
+  }, [products, productId]);
 
   return (
-    <div className="ProductDetailsPage">
-    {/* Render product details here */}
+    <div className="ProductDetailsPage" style={{ padding: "24px" }}>
+      {product && (
+        <div className="details" style={{ display: "flex", gap: "24px" }}>
+          <img src={product.image} alt="product-image" />
+          <p
+            style={{
+              border: "1px solid #433bde",
+              backgroundColor: "#433bde",
+              padding: " 0px 8px",
+              borderRadius: "4px",
+            }}
+          >
+            {product.category}
+          </p>
+          <h1>{product.title}</h1>
+          <div
+            className="details-container"
+            style={{ display: "flex", gap: "80px" }}
+          >
+            <p style={{ textAlign: "left" }}>{product.description}</p>
+            <strong style={{ color: "#433bde" }}>{product.price}</strong>
+          </div>
+        </div>
+      )}
+
+      <hr />
+
+      <Link to="/">
+        <button style={{ backgroundColor: "#5db579" }}>Back</button>
+      </Link>
     </div>
   );
 }
